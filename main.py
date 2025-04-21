@@ -88,7 +88,7 @@ def summary_dr_qtr(df_dr_cr):
     print("\n>>>>>> Quarterly Summary of Withdrawals Spent\n")
     print(df_qtr)
 
-def main(file_path, file_name, year, month, amount_greater_than):
+def main(file_path=r"C:/Users/sasuk/", file_name="OpTransactionHistoryTpr02-04-2025 (1).xls", year=2024, month=11, amount_greater_than=5000):
     df = data_cleaning_EDA(file_path, file_name)
 
     summary_dr_cr_indiv(df, year, month, amount_greater_than)
@@ -104,4 +104,4 @@ def main(file_path, file_name, year, month, amount_greater_than):
 # year=2024
 # month=11
 # amount_greater_than=5000
-main(file_path=r"C:/Users/sasuk/", file_name="OpTransactionHistoryTpr02-04-2025 (1).xls", year=2024, month=11, amount_greater_than=5000)
+# main()
