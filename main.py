@@ -3,6 +3,7 @@
 # output: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits, Quaterly Summary of Withdrawals
 # 02-04-2025 Aditya Satam: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits
 # 20-04-2025 Aditya Satam: Quaterly Summary of Withdrawals
+# 03-04-2025 Aditya Satam: Quaterly Summary of Debit Card Withdrawals (Lounge Access)
 
 import pandas as pd
 
@@ -43,18 +44,21 @@ def summary_dr_cr(fdf):
     df_dr_cr['Savings'] = df_dr_cr['Deposit'] - df_dr_cr['Withdrawal']
     df_dr_cr['Balance_MonthEnd'] = Current_Balance - df_dr_cr['Savings'].cumsum().shift(fill_value=0)
     df_dr_cr['Month'] = df_dr_cr['Month'].map(month_dict)
+    return df_dr_cr
+
+# Print Monthly Summary of Withdrawals and Deposits
+def print_summary_dr_cr(df_dr_cr):
     print("\n>>>>>> Monthly Summary of Withdrawals and Deposits\n")
     print(df_dr_cr)
-    return df_dr_cr
 
 # Monthly Summary of Significant Withdrawals/Deposits
 def summary_dr_cr_indiv(fdf, year, month, amount_greater_than):
-    df_dr = fdf[(fdf['Withdrawal'] > amount_greater_than) & 
+    df_dr = fdf[(fdf['Withdrawal'].astype(float) > amount_greater_than) & 
                             (fdf['Month'] == month) & 
                             (fdf['Year'] == year)][['MonthName', 'Remark',
                                                             'Withdrawal']].rename(columns={'Withdrawal': 'Amount'})
     df_dr['Type'] = 'Withdrawal'
-    df_cr = fdf[(fdf['Deposit'] > amount_greater_than) & 
+    df_cr = fdf[(fdf['Deposit'].astype(float) > amount_greater_than) & 
                             (fdf['Month'] == month) & 
                             (fdf['Year'] == year)][['MonthName', 'Remark',
                                                             'Deposit']].rename(columns={'Deposit': 'Amount'})
@@ -64,7 +68,7 @@ def summary_dr_cr_indiv(fdf, year, month, amount_greater_than):
     print(df_union)
 
 # Quaterly Summary of Withdrawals
-def summary_dr_qtr(df_dr_cr):
+def summary_dr_qtr(df_dr_cr, message):
     df_qtr = pd.DataFrame(columns=['Year', 'Quarter', 'Period', 'Actual_Period', 'Withdrawal'])
     qtr_dict = {"Q1": ["Jan", "Feb", "Mar"], "Q2": ["Apr", "May", "Jun"], 
                     "Q3": ["Jul", "Aug", "Sep"], "Q4": ["Oct", "Nov", "Dec"]}
@@ -85,15 +89,21 @@ def summary_dr_qtr(df_dr_cr):
                     df_qtr = pd.concat([df_qtr, pd.DataFrame([new_row])], ignore_index=True)
                 else:
                     df_qtr = pd.DataFrame([new_row])
-    print("\n>>>>>> Quarterly Summary of Withdrawals Spent\n")
+    print(f"\n>>>>>> {message}\n")
     print(df_qtr)
 
 def main(file_path=r"C:/Users/sasuk/", file_name="OpTransactionHistoryTpr02-04-2025 (1).xls", year=2024, month=11, amount_greater_than=5000):
     df = data_cleaning_EDA(file_path, file_name)
-
     summary_dr_cr_indiv(df, year, month, amount_greater_than)
+
     res_df = summary_dr_cr(df)
-    summary_dr_qtr(res_df)
+    print_summary_dr_cr(res_df)
+
+    summary_dr_qtr(res_df, "Quarterly Summary of Withdrawals Spent")
+
+    filtered_df = df[df['Remark'].astype(str).str.contains(r'VIN/', na=False)]
+    new_res_df = summary_dr_cr(filtered_df)
+    summary_dr_qtr(new_res_df, "Quarterly ICICI Debit Card Spend for Lounge Access")
 
 
 # # set file path and name
