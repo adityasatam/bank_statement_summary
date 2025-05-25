@@ -1,6 +1,6 @@
 import requests
 
-url = "https://raw.githubusercontent.com/adityasatam/bank_statement_summary/refs/heads/main/main.py?token=GHSAT0AAAAAADCSNWSLS42Y52W27JQN4FWW2AGRGGA"
+url = "https://raw.githubusercontent.com/adityasatam/bank_statement_summary/refs/heads/main/main.py?token=GHSAT0AAAAAADEQJLXYAXX4DA5ZH264TCD42BTLJNQ"
 response = requests.get(url)
 
 if response.status_code == 200:
