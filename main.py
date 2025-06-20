@@ -1,32 +1,60 @@
-# input: icici bank xls format bank statement
-# set the required values: file_path, file_name, year, month, amount_greater_than
+# input: bank xls format bank statement
+# set the required values: bank_name, file_path, file_name, year, month, amount_greater_than
 # output: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits, Quaterly Summary of Withdrawals
 # 02-04-2025 Aditya Satam: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits
 # 20-04-2025 Aditya Satam: Quaterly Summary of Withdrawals
 # 03-04-2025 Aditya Satam: Quaterly Summary of Debit Card Withdrawals (Lounge Access)
+# 20-06-2025 Aditya Satam: included hdfc bank with icici bank
 
 import pandas as pd
 
 # Data reading, cleaning and EDA
-def data_cleaning_EDA(file_path, file_name):
+def data_cleaning_EDA(file_path, file_name, bank_name):
     # read xls file into python dataframe
     df = pd.read_excel(file_path+file_name, engine="xlrd")
 
-    # rename xls columns
-    df.columns = ["DummyColumn", "SNo", "ValueDate", "TransationDate", 
-                  "ChequeNo", "Remark", "Withdrawal", "Deposit", "Balance"]
+    if bank_name=='hdfc':
+        # rename xls columns
+        df.columns = ["Date", "Remark", "ChequeNo", "TransationDate", 
+                    "Withdrawal", "Deposit", "Balance"]
+        
+        # filter top description till Balance column has data
+        df['Balance'] = pd.to_numeric(df['Balance'], errors='coerce')
+        first_idx = None
+        last_idx = None
+        for idx, val in df['Balance'].items():
+            if pd.notna(val):
+                if first_idx is None:
+                    first_idx = idx  # first numeric
+            else:
+                if first_idx is not None:
+                    last_idx = idx  # first non-numeric after numeric started
+                    break
+        fdf = df.loc[first_idx:last_idx-1].copy()
 
-    # filter top description till Balance column has data
-    first_valid_row = df['Balance'].first_valid_index()
-    fdf = df.loc[first_valid_row+1:] # +1 to filter out Balalnce (INR) header
-    fdf =fdf[fdf['Balance'].notna()] # filter out Nan records
+        # create new month, year columns using Transation date column
+        fdf['TransationDate'] = pd.to_datetime(fdf['TransationDate'], format='%d/%m/%y')
 
-    # create new month, year columns using Transation date column
-    fdf['TransationDate'] = pd.to_datetime(fdf['TransationDate'], format='%d/%m/%Y')
+        remark_keyword = 'POS'
+    else:
+        # rename xls columns
+        df.columns = ["DummyColumn", "SNo", "ValueDate", "TransationDate", 
+                    "ChequeNo", "Remark", "Withdrawal", "Deposit", "Balance"]
+
+        # filter top description till Balance column has data
+        first_valid_row = df['Balance'].first_valid_index()
+        fdf = df.loc[first_valid_row+1:] # +1 to filter out Balalnce (INR) header
+        fdf =fdf[fdf['Balance'].notna()] # filter out Nan records
+
+        # create new month, year columns using Transation date column
+        fdf['TransationDate'] = pd.to_datetime(fdf['TransationDate'], format='%d/%m/%Y')
+
+        remark_keyword = 'VIN/'
+
     fdf['Year'] = fdf['TransationDate'].dt.year.astype(int) # Extract Year
     fdf['Month'] = fdf['TransationDate'].dt.month.astype(int) # Extract Month (Numeric)
     fdf['MonthName'] = fdf['TransationDate'].dt.strftime('%b')  # Extract Full Month Name
-    return fdf
+    return fdf, remark_keyword
 
 # Monthly Summary of Withdrawals and Deposits
 def summary_dr_cr(fdf):
@@ -91,19 +119,19 @@ def summary_dr_qtr(df_dr_cr, message):
                     df_qtr = pd.DataFrame([new_row])
     print(f"\n>>>>>> {message}\n")
     print(df_qtr)
-
-def main(file_path=r"C:/Users/sasuk/", file_name="OpTransactionHistoryTpr02-04-2025 (1).xls", year=2024, month=11, amount_greater_than=5000):
-    df = data_cleaning_EDA(file_path, file_name)
+#OpTransactionHistoryTpr25-05-2025.xls, Acct_Statement_XX7897_20062025.xls
+def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025.xls", year=2025, month=4, amount_greater_than=5000):
+    df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
     summary_dr_cr_indiv(df, year, month, amount_greater_than)
 
     res_df = summary_dr_cr(df)
     print_summary_dr_cr(res_df)
 
     summary_dr_qtr(res_df, "Quarterly Summary of Withdrawals Spent")
-
-    filtered_df = df[df['Remark'].astype(str).str.contains(r'VIN/', na=False)]
+    
+    filtered_df = df[df['Remark'].astype(str).str.contains(fr'{remark_keyword}', na=False)]
     new_res_df = summary_dr_cr(filtered_df)
-    summary_dr_qtr(new_res_df, "Quarterly ICICI Debit Card Spend for Lounge Access")
+    summary_dr_qtr(new_res_df, "Quarterly Debit Card Spend for Lounge Access")
 
 
 # # set file path and name
