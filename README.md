@@ -1,7 +1,9 @@
 # bank_statement_summary
 
-input: icici/hdfc bank xls format bank statement
+input: bank xls format bank statement
 set the required values: bank_name, file_path, file_name, year, month, amount_greater_than
 output: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits, Quaterly Summary of Withdrawals
 02-04-2025 Aditya Satam: Monthly Summary of Withdrawals, Deposits and Significant Withdrawals/Deposits
 20-04-2025 Aditya Satam: Quaterly Summary of Withdrawals
+03-04-2025 Aditya Satam: Quaterly Summary of Debit Card Withdrawals (Lounge Access)
+20-06-2025 Aditya Satam: included hdfc bank with icici bank
