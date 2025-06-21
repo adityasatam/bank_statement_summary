@@ -8,6 +8,11 @@
 
 import pandas as pd
 
+pd.set_option('display.max_rows', None)        # 1. Show all rows
+pd.set_option('display.max_columns', None)     # 2. Show all columns
+pd.set_option('display.max_colwidth', None)    # 3. Don't truncate long column values
+pd.set_option('display.expand_frame_repr', False)  # 4. Prevent wrapping to multiple lines
+
 # Data reading, cleaning and EDA
 def data_cleaning_EDA(file_path, file_name, bank_name):
     # read xls file into python dataframe
