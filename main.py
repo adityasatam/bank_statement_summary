@@ -17,7 +17,7 @@ pd.set_option('display.expand_frame_repr', False)  # 4. Prevent wrapping to mult
 # Data reading, cleaning and EDA
 def data_cleaning_EDA(file_path, file_name, bank_name):
     # read xls file into python dataframe
-    df = pd.read_excel(file_path+file_name, engine="xlrd")
+    df = pd.read_excel(file_path+file_name+'.xls', engine="xlrd")
 
     if bank_name=='hdfc':
         # rename xls columns
@@ -128,8 +128,8 @@ def summary_dr_qtr(df_dr_cr, message):
                     df_qtr = pd.DataFrame([new_row])
     print(f"\n>>>>>> {message}\n")
     print(df_qtr)
-#OpTransactionHistoryTpr25-05-2025.xls, Acct_Statement_XX7897_20062025.xls
-def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025.xls", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
+
+def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
     df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
     summary_dr_cr_indiv(df, year, month, amount_greater_than, remark_match)
 
@@ -145,7 +145,7 @@ def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Stateme
 
 # # set file path and name
 # file_path=r"C:/Users/sasuk/"
-# file_name="OpTransactionHistoryTpr02-04-2025 (1).xls"
+# file_name="OpTransactionHistoryTpr02-04-2025 (1)"
 
 # # set the filter for 2nd report on Top Withdrawal and Deposit
 # year=2024
