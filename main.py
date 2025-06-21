@@ -5,6 +5,7 @@
 # 20-04-2025 Aditya Satam: Quaterly Summary of Withdrawals
 # 03-04-2025 Aditya Satam: Quaterly Summary of Debit Card Withdrawals (Lounge Access)
 # 20-06-2025 Aditya Satam: included hdfc bank with icici bank
+# 21-06-2025 Aditya Satam: included multiple months, remark_match, day in report "Monthly Summary of Significant Withdrawals/Deposits"
 
 import pandas as pd
 
@@ -40,7 +41,7 @@ def data_cleaning_EDA(file_path, file_name, bank_name):
         # create new month, year columns using Transation date column
         fdf['TransationDate'] = pd.to_datetime(fdf['TransationDate'], format='%d/%m/%y')
 
-        remark_keyword = 'POS'
+        remark_keyword = 'POS '
     else:
         # rename xls columns
         df.columns = ["DummyColumn", "SNo", "ValueDate", "TransationDate", 
@@ -58,6 +59,7 @@ def data_cleaning_EDA(file_path, file_name, bank_name):
 
     fdf['Year'] = fdf['TransationDate'].dt.year.astype(int) # Extract Year
     fdf['Month'] = fdf['TransationDate'].dt.month.astype(int) # Extract Month (Numeric)
+    fdf['Day'] = fdf['TransationDate'].dt.day.astype(int) # Extract Day (Numeric)
     fdf['MonthName'] = fdf['TransationDate'].dt.strftime('%b')  # Extract Full Month Name
     return fdf, remark_keyword
 
@@ -85,15 +87,17 @@ def print_summary_dr_cr(df_dr_cr):
     print(df_dr_cr)
 
 # Monthly Summary of Significant Withdrawals/Deposits
-def summary_dr_cr_indiv(fdf, year, month, amount_greater_than):
+def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match):
     df_dr = fdf[(fdf['Withdrawal'].astype(float) > amount_greater_than) & 
-                            (fdf['Month'] == month) & 
-                            (fdf['Year'] == year)][['MonthName', 'Remark',
+                            (fdf['Remark'].astype(str).str.contains(remark_match, case=True, na=False)) &
+                            (fdf['Month'].isin(month)) & 
+                            (fdf['Year'] == year)][['Day', 'MonthName', 'Remark',
                                                             'Withdrawal']].rename(columns={'Withdrawal': 'Amount'})
     df_dr['Type'] = 'Withdrawal'
-    df_cr = fdf[(fdf['Deposit'].astype(float) > amount_greater_than) & 
-                            (fdf['Month'] == month) & 
-                            (fdf['Year'] == year)][['MonthName', 'Remark',
+    df_cr = fdf[(fdf['Deposit'].astype(float) > amount_greater_than) &
+                            (fdf['Remark'].astype(str).str.contains(remark_match, case=False, na=False)) &
+                            (fdf['Month'].isin(month)) & 
+                            (fdf['Year'] == year)][['Day' ,'MonthName', 'Remark',
                                                             'Deposit']].rename(columns={'Deposit': 'Amount'})
     df_cr['Type'] = 'Deposit'
     df_union = pd.concat([df_dr, df_cr], ignore_index=True)
@@ -125,9 +129,9 @@ def summary_dr_qtr(df_dr_cr, message):
     print(f"\n>>>>>> {message}\n")
     print(df_qtr)
 #OpTransactionHistoryTpr25-05-2025.xls, Acct_Statement_XX7897_20062025.xls
-def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025.xls", year=2025, month=4, amount_greater_than=5000):
+def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025.xls", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
     df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
-    summary_dr_cr_indiv(df, year, month, amount_greater_than)
+    summary_dr_cr_indiv(df, year, month, amount_greater_than, remark_match)
 
     res_df = summary_dr_cr(df)
     print_summary_dr_cr(res_df)
