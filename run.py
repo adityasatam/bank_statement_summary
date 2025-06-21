@@ -1,8 +1,9 @@
 import requests
 
-# pre-requisite:
-# 1) go to this url: "https://github.com/adityasatam/bank_statement_summary/blob/main/main.py", click on the Raw option, copy the latest url below.
-# 2) copy this run.py in local VS Code and execute.
+# 1) keep your bank statement in local folder.
+# 2) copy this run.py in your local VS Code.
+# 4) modify only line 13 with bank statement file name, file path and other parameters.
+# 5) execute run.py in your local VS Code.
 
 url = "https://raw.githubusercontent.com/adityasatam/bank_statement_summary/refs/heads/main/main.py"
 response = requests.get(url)
