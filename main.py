@@ -17,7 +17,7 @@ pd.set_option('display.expand_frame_repr', False)  # 4. Prevent wrapping to mult
 # Data reading, cleaning and EDA
 def data_cleaning_EDA(file_path, file_name, bank_name):
     # read xls file into python dataframe
-    df = pd.read_excel(file_path+file_name+'.xls', engine="xlrd")
+    df = pd.read_excel(file_path+file_name+".xls", engine="xlrd")
 
     if bank_name=='hdfc':
         # rename xls columns
