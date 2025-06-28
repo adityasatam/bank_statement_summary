@@ -9,6 +9,7 @@
 # 28-06-2025 Aditya Satam: added save% and spend/invest% monthly report
 
 import pandas as pd
+import numpy as np
 
 pd.set_option('display.max_rows', None)        # 1. Show all rows
 pd.set_option('display.max_columns', None)     # 2. Show all columns
