@@ -6,6 +6,7 @@
 # 03-04-2025 Aditya Satam: Quaterly Summary of Debit Card Withdrawals (Lounge Access)
 # 20-06-2025 Aditya Satam: included hdfc bank with icici bank
 # 21-06-2025 Aditya Satam: included multiple months, remark_match, day in report "Monthly Summary of Significant Withdrawals/Deposits"
+# 28-06-2025 Aditya Satam: added save% and spend/invest% monthly
 
 import pandas as pd
 
@@ -79,6 +80,10 @@ def summary_dr_cr(fdf):
     df_dr_cr['Savings'] = df_dr_cr['Deposit'] - df_dr_cr['Withdrawal']
     df_dr_cr['Balance_MonthEnd'] = Current_Balance - df_dr_cr['Savings'].cumsum().shift(fill_value=0)
     df_dr_cr['Month'] = df_dr_cr['Month'].map(month_dict)
+
+    safe_deposit = np.where(df_dr_cr['Deposit'] == 0, np.nan, df_dr_cr['Deposit'])
+    df_dr_cr['Save%'] = (pd.to_numeric(df_dr_cr['Savings']/safe_deposit)*100).round(1).fillna(0)
+    df_dr_cr['Spend/Invest%'] = (pd.to_numeric(df_dr_cr['Withdrawal']/safe_deposit)*100).round(1).fillna(0)
     return df_dr_cr
 
 # Print Monthly Summary of Withdrawals and Deposits
