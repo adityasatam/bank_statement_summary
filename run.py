@@ -1,4 +1,5 @@
 import requests
+import numpy as np
 
 # 1) keep your bank statement in xls format in local folder.
 # 2) copy this run.py in your local VS Code.
