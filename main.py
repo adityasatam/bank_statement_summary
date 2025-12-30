@@ -99,12 +99,12 @@ def summary_dr_cr(fdf):
     return df_dr_cr
 
 # Print Monthly Summary of Withdrawals and Deposits
-def print_summary_dr_cr(df_dr_cr):
-    print("\n>>>>>> Monthly Summary of Withdrawals and Deposits\n")
+def print_summary_dr_cr(df_dr_cr, message):
+    print("\n>>>>>> {message}\n")
     print(df_dr_cr)
 
 # Monthly Summary of Significant Withdrawals/Deposits
-def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match):
+def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match, message):
     df_dr = fdf[(fdf['Withdrawal'].astype(float) > amount_greater_than) & 
                             (fdf['Remark'].astype(str).str.contains(remark_match, case=True, na=False)) &
                             (fdf['Month'].isin(month)) & 
@@ -118,7 +118,7 @@ def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match):
                                                             'Deposit']].rename(columns={'Deposit': 'Amount'})
     df_cr['Type'] = 'Deposit'
     df_union = pd.concat([df_dr, df_cr], ignore_index=True)
-    print("\n>>>>>> Monthly Summary of Significant Withdrawals/Deposits\n")
+    print("\n>>>>>> {message}\n")
     print(df_union)
 
 # Quaterly Summary of Withdrawals
@@ -148,10 +148,10 @@ def summary_dr_qtr(df_dr_cr, message):
 
 def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
     df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
-    summary_dr_cr_indiv(df, year, month, amount_greater_than, remark_match)
+    summary_dr_cr_indiv(df, year, month, amount_greater_than, remark_match, "Monthly Summary of Significant Withdrawals/Deposits")
 
     res_df = summary_dr_cr(df)
-    print_summary_dr_cr(res_df)
+    print_summary_dr_cr(res_df, "Monthly Summary of Withdrawals and Deposits")
 
     summary_dr_qtr(res_df, "Quarterly Summary of Withdrawals Spent")
     
