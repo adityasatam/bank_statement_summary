@@ -100,7 +100,7 @@ def summary_dr_cr(fdf):
 
 # Print Monthly Summary of Withdrawals and Deposits
 def print_summary_dr_cr(df_dr_cr, message):
-    print("\n>>>>>> {message}\n")
+    print(f"\n>>>>>> {message}\n")
     print(df_dr_cr)
 
 # Monthly Summary of Significant Withdrawals/Deposits
@@ -118,7 +118,7 @@ def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match, mes
                                                             'Deposit']].rename(columns={'Deposit': 'Amount'})
     df_cr['Type'] = 'Deposit'
     df_union = pd.concat([df_dr, df_cr], ignore_index=True)
-    print("\n>>>>>> {message}\n")
+    print(f"\n>>>>>> {message}\n")
     print(df_union)
 
 # Quaterly Summary of Withdrawals
