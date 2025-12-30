@@ -63,6 +63,17 @@ def data_cleaning_EDA(file_path, file_name, bank_name):
     fdf['Month'] = fdf['TransationDate'].dt.month.astype(int) # Extract Month (Numeric)
     fdf['Day'] = fdf['TransationDate'].dt.day.astype(int) # Extract Day (Numeric)
     fdf['MonthName'] = fdf['TransationDate'].dt.strftime('%b')  # Extract Full Month Name
+    
+    # --- Normalize numeric columns (CRITICAL FIX) ---
+    for col in ['Withdrawal', 'Deposit', 'Balance']:
+        if col in fdf.columns:
+            fdf[col] = (
+                fdf[col]
+                .astype(str)
+                .str.replace(',', '', regex=False)
+                .replace('', '0')
+                .astype(float)
+            )
     return fdf, remark_keyword
 
 # Monthly Summary of Withdrawals and Deposits
