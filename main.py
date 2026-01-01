@@ -107,8 +107,9 @@ def summary_dr_cr_mth(fdf, from_date='', to_date=''):
 
 # Print Dataframe
 def print_df(df, message):
-    print(f"\n>>>>>> {message}\n")
-    print(df)
+    if df:
+        print(f"\n>>>>>> {message}\n")
+        print(df)
 
 # Monthly Significant Withdrawals/Deposits
 def summary_dr_cr_indv(fdf, year, month, amount_greater_than, remark_match):
