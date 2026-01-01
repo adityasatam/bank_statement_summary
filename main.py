@@ -7,6 +7,7 @@
 # 20-06-2025 Aditya Satam: included hdfc bank with icici bank
 # 21-06-2025 Aditya Satam: included multiple months, remark_match, day in report "Monthly Summary of Significant Withdrawals/Deposits"
 # 28-06-2025 Aditya Satam: added save% and spend/invest% monthly report
+# 01-01-2026 Aditya Satam: added Date Range, Upstox, SIP reports
 
 import pandas as pd
 import numpy as np
