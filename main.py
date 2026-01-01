@@ -152,9 +152,15 @@ def summary_dr_qtr(df_dr_cr):
                     df_qtr = pd.DataFrame([new_row])
     return df_qtr
 
-def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match='', from_date='23/12/2025', to_date='26/12/2025'):
-    df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
+def filter_summary_dr_cr_mth(df, remark):
+    filtered_df = df[df['Remark'].astype(str).str.contains(fr'{remark}', na=False)]
+    res_df = summary_dr_cr_mth(filtered_df)
+    return res_df
 
+def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match='', from_date='23/12/2025', to_date='26/12/2025'):
+
+    df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
+    
     res_df_1 = summary_dr_cr_mth(df)
     print_df(res_df_1, "Monthly Withdrawals/Deposits")
     
@@ -171,6 +177,12 @@ def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Stateme
     
     res_df_6 = summary_dr_cr_mth(df, from_date, to_date)
     print_df(res_df_6, "Date Range Withdrawals/Deposits")
+    
+    res_df_7 = filter_summary_dr_cr_mth(df, 'UPSTOX')
+    print_df(res_df_7[['Month','Year','Withdrawal','Deposit']], "Monthly Upstox Withdrawals/Deposits")
+    
+    res_df_8 = filter_summary_dr_cr_mth(df, 'INDIAN CLEARING CORP')
+    print_df(res_df_8[['Month','Year','Withdrawal','Deposit']], "Monthly SIP Withdrawals/Deposits")
 
 # # set file path and name
 # file_path=r"C:/Users/sasuk/"
@@ -181,4 +193,3 @@ def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Stateme
 # month=11
 # amount_greater_than=5000
 # main()
-
