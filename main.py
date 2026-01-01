@@ -151,7 +151,7 @@ def summary_dr_qtr(df_dr_cr):
                     df_qtr = pd.DataFrame([new_row])
     return df_qtr
 
-def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
+def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match='', from_date='23/12/2025', to_date='26/12/2025'):
     df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
 
     res_df_1 = summary_dr_cr_mth(df)
