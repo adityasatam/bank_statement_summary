@@ -76,12 +76,19 @@ def data_cleaning_EDA(file_path, file_name, bank_name):
             )
     return fdf, remark_keyword
 
-# Monthly Summary of Withdrawals and Deposits
-def summary_dr_cr(fdf):
+# Monthly Withdrawals/Deposits
+def summary_dr_cr_mth(fdf, from_date='', to_date=''):
     # month number, name mapping
     month_dict = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7:
                       'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
     Current_Balance = fdf['Balance'].iloc[-1]
+
+    # filter fdf on date range
+    if from_date and to_date:
+        from_date = pd.to_datetime(from_date, format='%d/%m/%Y')
+        to_date = pd.to_datetime(to_date, format='%d/%m/%Y')
+        fdf = fdf[fdf['TransationDate'].between(from_date, to_date)]
+
     df_dr_cr = fdf.groupby(['Month',
                                                 'Year'])[['Withdrawal',
                                                           'Deposit']].sum().sort_values(by=['Year',
@@ -98,13 +105,13 @@ def summary_dr_cr(fdf):
     df_dr_cr['Spend/Invest%'] = (pd.to_numeric(df_dr_cr['Withdrawal']/safe_deposit)*100).round(1).fillna(0)
     return df_dr_cr
 
-# Print Monthly Summary of Withdrawals and Deposits
-def print_summary_dr_cr(df_dr_cr, message):
+# Print Dataframe
+def print_df(df, message):
     print(f"\n>>>>>> {message}\n")
-    print(df_dr_cr)
+    print(df)
 
-# Monthly Summary of Significant Withdrawals/Deposits
-def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match, message):
+# Monthly Significant Withdrawals/Deposits
+def summary_dr_cr_indv(fdf, year, month, amount_greater_than, remark_match):
     df_dr = fdf[(fdf['Withdrawal'].astype(float) > amount_greater_than) & 
                             (fdf['Remark'].astype(str).str.contains(remark_match, case=True, na=False)) &
                             (fdf['Month'].isin(month)) & 
@@ -118,11 +125,10 @@ def summary_dr_cr_indiv(fdf, year, month, amount_greater_than, remark_match, mes
                                                             'Deposit']].rename(columns={'Deposit': 'Amount'})
     df_cr['Type'] = 'Deposit'
     df_union = pd.concat([df_dr, df_cr], ignore_index=True)
-    print(f"\n>>>>>> {message}\n")
-    print(df_union)
+    return df_union
 
-# Quaterly Summary of Withdrawals
-def summary_dr_qtr(df_dr_cr, message):
+# Quaterly Withdrawals
+def summary_dr_qtr(df_dr_cr):
     df_qtr = pd.DataFrame(columns=['Year', 'Quarter', 'Period', 'Actual_Period', 'Withdrawal'])
     qtr_dict = {"Q1": ["Jan", "Feb", "Mar"], "Q2": ["Apr", "May", "Jun"], 
                     "Q3": ["Jul", "Aug", "Sep"], "Q4": ["Oct", "Nov", "Dec"]}
@@ -143,22 +149,27 @@ def summary_dr_qtr(df_dr_cr, message):
                     df_qtr = pd.concat([df_qtr, pd.DataFrame([new_row])], ignore_index=True)
                 else:
                     df_qtr = pd.DataFrame([new_row])
-    print(f"\n>>>>>> {message}\n")
-    print(df_qtr)
+    return df_qtr
 
 def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Statement_XX7897_20062025", year=2025, month=[4,5,6], amount_greater_than=1000, remark_match=''):
     df, remark_keyword = data_cleaning_EDA(file_path, file_name, bank_name)
-    summary_dr_cr_indiv(df, year, month, amount_greater_than, remark_match, "Monthly Summary of Significant Withdrawals/Deposits")
 
-    res_df = summary_dr_cr(df)
-    print_summary_dr_cr(res_df, "Monthly Summary of Withdrawals and Deposits")
-
-    summary_dr_qtr(res_df, "Quarterly Summary of Withdrawals Spent")
+    res_df_1 = summary_dr_cr_mth(df)
+    print_df(res_df_1, "Monthly Withdrawals/Deposits")
+    
+    res_df_2 = summary_dr_qtr(res_df_1)
+    print_df(res_df_2, "Quarterly Withdrawals")
     
     filtered_df = df[df['Remark'].astype(str).str.contains(fr'{remark_keyword}', na=False)]
-    new_res_df = summary_dr_cr(filtered_df)
-    summary_dr_qtr(new_res_df, "Quarterly Debit Card Spend for Lounge Access")
-
+    res_df_3 = summary_dr_cr_mth(filtered_df)
+    res_df_4 = summary_dr_qtr(res_df_3)
+    print_df(res_df_4, "Quarterly Withdrawals for Lounge Access")
+    
+    res_df_5 = summary_dr_cr_indv(df, year, month, amount_greater_than, remark_match)
+    print_df(res_df_5, "Monthly Significant Withdrawals/Deposits")
+    
+    res_df_6 = summary_dr_cr_mth(df, from_date, to_date)
+    print_df(res_df_6, "Date Range Withdrawals/Deposits")
 
 # # set file path and name
 # file_path=r"C:/Users/sasuk/"
@@ -169,3 +180,4 @@ def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Stateme
 # month=11
 # amount_greater_than=5000
 # main()
+
