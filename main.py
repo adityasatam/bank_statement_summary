@@ -107,7 +107,7 @@ def summary_dr_cr_mth(fdf, from_date='', to_date=''):
 
 # Print Dataframe
 def print_df(df, message):
-    if df:
+    if not df.empty:
         print(f"\n>>>>>> {message}\n")
         print(df)
 
