@@ -167,8 +167,7 @@ def main(bank_name='hdfc', file_path=r"C:/Users/sasuk/", file_name="Acct_Stateme
     res_df_2 = summary_dr_qtr(res_df_1)
     print_df(res_df_2, "Quarterly Withdrawals")
     
-    filtered_df = df[df['Remark'].astype(str).str.contains(fr'{remark_keyword}', na=False)]
-    res_df_3 = summary_dr_cr_mth(filtered_df)
+    res_df_3 = filter_summary_dr_cr_mth(df, remark_keyword)
     res_df_4 = summary_dr_qtr(res_df_3)
     print_df(res_df_4, "Quarterly Withdrawals for Lounge Access")
     
